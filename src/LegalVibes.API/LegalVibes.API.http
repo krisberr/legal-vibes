@@ -1,0 +1,6 @@
+@LegalVibes.API_HostAddress = http://localhost:5229
+
+GET {{LegalVibes.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
