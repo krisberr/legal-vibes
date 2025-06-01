@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using Serilog;
+using LegalVibes.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +15,11 @@ builder.Host.UseSerilog((context, services, configuration) => configuration
     .Enrich.FromLogContext()
     .WriteTo.Console());
 
-// Add services to the container
+// Add services to the container.
+builder.Services.AddInfrastructure(builder.Configuration);
+
 builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -27,15 +31,16 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// Configure CORS
+// Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        builder => builder
-            .WithOrigins("http://localhost:5173") // Vite default port
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
 });
 
 var app = builder.Build();
@@ -71,14 +76,17 @@ else
     Log.Information("HTTPS redirection enabled for development (port: {HttpsPort})", httpsPort);
 }
 
-app.UseRouting();
-app.UseCors("AllowReactApp");
+// Use CORS
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Map controllers and log available routes
 app.MapControllers();
+
+// Add health check endpoint
+app.MapGet("/health", () => "Healthy");
 
 var urls = string.Join(", ", builder.WebHost.GetSetting("urls")?.Split(';') ?? new[] { "No URLs configured" });
 Log.Information("Application configured with URLs: {Urls}", urls);
