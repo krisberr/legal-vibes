@@ -48,12 +48,23 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
+    app.UseSwagger(c =>
+    {
+        c.RouteTemplate = "swagger/{documentName}/swagger.json";
+        c.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
+        {
+            var scheme = httpReq.Scheme;
+            var host = httpReq.Host.Value;
+            swaggerDoc.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{scheme}://{host}" } };
+        });
+    });
+    
     app.UseSwaggerUI(c => 
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Legal Vibes API v1");
+        c.SwaggerEndpoint("v1/swagger.json", "Legal Vibes API v1");
         c.RoutePrefix = "swagger";
     });
+    
     Log.Information("Swagger UI enabled at /swagger");
 }
 
