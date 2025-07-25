@@ -36,8 +36,31 @@ LegalVibes/
 ### Prerequisites
 - .NET 9.0 SDK
 - Node.js (Latest LTS)
-- SQL Server (or your preferred database)
+- SQL Server 2019+ or SQL Server Express (Developer Edition recommended)
+- SQL Server Management Studio (SSMS)
 - OpenAI API Key (for AI features)
+
+### SQL Server Management
+1. **Start SQL Server** (run as Administrator):
+   ```bash
+   # Navigate to scripts directory
+   cd src/LegalVibes.Infrastructure/Scripts
+   
+   # Start SQL Server services
+   start-sql.bat
+   ```
+
+2. **Create Database** (first time only):
+   ```bash
+   # In SSMS, connect to localhost with Windows Authentication
+   # Open and execute: CreateDatabase.sql
+   ```
+
+3. **Stop SQL Server** when done developing:
+   ```bash
+   # Stop SQL Server services (run as Administrator)
+   stop-sql.bat
+   ```
 
 ### Backend Setup
 1. Navigate to the API project:
@@ -52,9 +75,9 @@ LegalVibes/
    ```bash
    dotnet ef database update
    ```
-4. Run the API:
+4. **Run the API with HTTPS profile**:
    ```bash
-   dotnet run
+   dotnet run --launch-profile https
    ```
 
 ### Frontend Setup
@@ -83,8 +106,15 @@ LegalVibes/
 ## Development
 
 ### API Endpoints
-- Swagger UI: https://localhost:7032/swagger
-- Health Check: https://localhost:7032/api/healthcheck
+- **Swagger UI**: https://localhost:7032/swagger (recommended)
+- **Alternative HTTP**: http://localhost:5229/swagger
+- **Health Check**: https://localhost:7032/health
+
+### Authentication Testing
+1. **Register a new user** via `/api/auth/register` in Swagger
+2. **Login** via `/api/auth/login` to get JWT token
+3. **Authorize in Swagger**: Click 🔒 button, enter `Bearer <your-jwt-token>`
+4. **Test protected endpoints** like `/api/auth/profile`
 
 ### Environment Variables
 Create a `.env` file in the client directory with:
