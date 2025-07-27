@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<User> _userRepository;
     private IRepository<Project> _projectRepository;
     private IRepository<Document> _documentRepository;
+    private IRepository<Client> _clientRepository;
     private IDbContextTransaction _currentTransaction;
 
     public UnitOfWork(ApplicationDbContext context)
@@ -27,6 +28,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IRepository<Document> Documents =>
         _documentRepository ??= new GenericRepository<Document>(_context);
+
+    public IRepository<Client> Clients =>
+        _clientRepository ??= new GenericRepository<Client>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

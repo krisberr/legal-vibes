@@ -25,6 +25,7 @@ public static class DependencyInjection
 
         // Application Services
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IClientService, ClientService>();
         
         // Infrastructure Services
         services.AddScoped<IJwtService, JwtService>();
