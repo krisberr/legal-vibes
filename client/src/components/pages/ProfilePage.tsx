@@ -78,10 +78,10 @@ const ProfilePage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-indigo-600 hover:text-indigo-500">
+              <Link to="/dashboard" className="text-blue-600 hover:text-blue-500">
                 ← Back to Dashboard
               </Link>
-              <h1 className="text-2xl font-bold text-indigo-600">Legal Vibes</h1>
+              <h1 className="text-2xl font-bold text-blue-600">Legal Vibes</h1>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">
@@ -110,7 +110,7 @@ const ProfilePage: React.FC = () => {
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
                     Edit Profile
                   </button>
@@ -181,7 +181,7 @@ const ProfilePage: React.FC = () => {
                       value={formData.firstName}
                       onChange={handleInputChange}
                       disabled={isLoading}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50"
                       placeholder="Enter your first name"
                     />
                   ) : (
@@ -199,7 +199,7 @@ const ProfilePage: React.FC = () => {
                       value={formData.lastName}
                       onChange={handleInputChange}
                       disabled={isLoading}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50"
                       placeholder="Enter your last name"
                     />
                   ) : (
@@ -224,7 +224,7 @@ const ProfilePage: React.FC = () => {
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
                       disabled={isLoading}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50"
+                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm disabled:opacity-50"
                       placeholder="Enter your phone number"
                     />
                   ) : (
