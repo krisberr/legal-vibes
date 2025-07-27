@@ -109,4 +109,50 @@ public class JwtService : IJwtService
             return true; // Consider invalid tokens as expired
         }
     }
+
+    public ClaimsPrincipal? ValidateExpiredToken(string token)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ValidateIssuer = true,
+                ValidIssuer = _issuer,
+                ValidateAudience = true,
+                ValidAudience = _audience,
+                ValidateLifetime = false, // Don't validate expiry for refresh tokens
+                ClockSkew = TimeSpan.Zero
+            };
+
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+            return principal;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public bool IsTokenCloseToExpiring(string token, int thresholdMinutes = 15)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+            
+            var expiryTime = jwtToken.ValidTo;
+            var thresholdTime = DateTime.UtcNow.AddMinutes(thresholdMinutes);
+            
+            return expiryTime <= thresholdTime;
+        }
+        catch
+        {
+            return true; // Consider invalid tokens as needing refresh
+        }
+    }
 } 

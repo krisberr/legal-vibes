@@ -31,4 +31,19 @@ public interface IJwtService
     /// <param name="token">The JWT token to check</param>
     /// <returns>True if expired, false if still valid</returns>
     bool IsTokenExpired(string token);
+    
+    /// <summary>
+    /// Validates a token but allows for expired tokens (for refresh purposes)
+    /// </summary>
+    /// <param name="token">The JWT token to validate</param>
+    /// <returns>ClaimsPrincipal if structure is valid, null if malformed</returns>
+    System.Security.Claims.ClaimsPrincipal? ValidateExpiredToken(string token);
+    
+    /// <summary>
+    /// Checks if a token is close to expiring (within refresh threshold)
+    /// </summary>
+    /// <param name="token">The JWT token to check</param>
+    /// <param name="thresholdMinutes">Minutes before expiry to consider "close to expiring"</param>
+    /// <returns>True if token expires within threshold, false otherwise</returns>
+    bool IsTokenCloseToExpiring(string token, int thresholdMinutes = 15);
 } 
