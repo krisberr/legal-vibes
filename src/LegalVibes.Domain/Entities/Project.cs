@@ -10,15 +10,18 @@ public class Project : BaseEntity
     public ProjectStatus Status { get; set; }
     public ProjectType Type { get; set; }
     public DateTime? DueDate { get; set; }
-    public string ClientName { get; set; } = string.Empty;
-    public string ClientReference { get; set; } = string.Empty;
+    public string? ReferenceNumber { get; set; }
     
     // Navigation properties
     public Guid UserId { get; set; }
     public virtual User User { get; set; } = null!;
+    
+    public Guid ClientId { get; set; }
+    public virtual Client Client { get; set; } = null!;
+    
     public virtual ICollection<Document> Documents { get; set; } = new List<Document>();
     
-    // Client-specific information for trademark applications
+    // Project type-specific information (can be expanded later)
     public string? TrademarkName { get; set; }
     public string? TrademarkDescription { get; set; }
     public string? GoodsAndServices { get; set; }

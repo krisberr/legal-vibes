@@ -5,9 +5,11 @@ import LoginPage from './components/pages/LoginPage';
 import RegisterPage from './components/pages/RegisterPage';
 import Dashboard from './components/pages/Dashboard';
 import ProfilePage from './components/pages/ProfilePage';
+import ProjectsPage from './components/pages/ProjectsPage';
 import AdminPage from './components/pages/AdminPage';
 import AuthDebug from './components/AuthDebug';
 import ApiTest from './components/ApiTest';
+import Layout from './components/Layout';
 import { ProtectedRoute, PublicRoute, AdminRoute } from './components/RouteGuards';
 
 function App() {
@@ -25,7 +27,7 @@ function App() {
       
       <Router>
         <Routes>
-          {/* Public Routes */}
+          {/* Public Routes - No Layout */}
           <Route 
             path="/" 
             element={
@@ -51,12 +53,14 @@ function App() {
             } 
           />
           
-          {/* Protected Routes */}
+          {/* Protected Routes - With Layout */}
           <Route 
             path="/dashboard" 
             element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </ProtectedRoute>
             } 
           />
@@ -64,7 +68,19 @@ function App() {
             path="/profile" 
             element={
               <ProtectedRoute>
-                <ProfilePage />
+                <Layout>
+                  <ProfilePage />
+                </Layout>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/projects" 
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ProjectsPage />
+                </Layout>
               </ProtectedRoute>
             } 
           />
@@ -72,7 +88,9 @@ function App() {
             path="/admin" 
             element={
               <AdminRoute>
-                <AdminPage />
+                <Layout>
+                  <AdminPage />
+                </Layout>
               </AdminRoute>
             } 
           />

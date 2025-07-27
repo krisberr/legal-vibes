@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { updateProfile } from '../../services/api';
 
 const ProfilePage: React.FC = () => {
-  const { state, logout, updateUser } = useAuth();
+  const { state, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,35 +71,20 @@ const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="text-blue-600 hover:text-blue-500">
-                ← Back to Dashboard
-              </Link>
-              <h1 className="text-2xl font-bold text-blue-600">Legal Vibes</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                {state.user.firstName} {state.user.lastName}
-              </span>
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <>
       {/* Main Content */}
       <div className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              Profile Settings
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your account information and preferences
+            </p>
+          </div>
+
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <div className="flex justify-between items-center mb-6">
@@ -275,7 +259,7 @@ const ProfilePage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

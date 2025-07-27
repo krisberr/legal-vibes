@@ -42,6 +42,102 @@ export interface RegisterRequest {
   jobTitle?: string;
 }
 
+// Project Management Types
+export interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  companyName?: string;
+  address?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateClientRequest {
+  name: string;
+  email: string;
+  phoneNumber: string;
+  companyName?: string;
+  address?: string;
+}
+
+export interface UpdateClientRequest {
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+  companyName?: string;
+  address?: string;
+  isActive?: boolean;
+}
+
+export enum ProjectStatus {
+  Draft = 0,
+  InProgress = 1,
+  UnderReview = 2,
+  Submitted = 3,
+  Approved = 4,
+  Rejected = 5,
+  Completed = 6,
+  Archived = 7
+}
+
+export enum ProjectType {
+  TrademarkApplication = 0,
+  PatentApplication = 1,
+  CopyrightRegistration = 2,
+  IPConsultation = 3,
+  Other = 4
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  status: ProjectStatus;
+  type: ProjectType;
+  dueDate?: string;
+  referenceNumber?: string;
+  createdAt: string;
+  createdBy?: string;
+  clientId: string;
+  client: Client;
+  trademarkName?: string;
+  trademarkDescription?: string;
+  goodsAndServices?: string;
+  specialConsiderations?: string;
+}
+
+export interface CreateProjectRequest {
+  name: string;
+  description: string;
+  type: ProjectType;
+  clientId: string;
+  dueDate?: string;
+  referenceNumber?: string;
+  trademarkName?: string;
+  trademarkDescription?: string;
+  goodsAndServices?: string;
+  specialConsiderations?: string;
+}
+
+export interface UpdateProjectRequest {
+  name?: string;
+  description?: string;
+  status?: ProjectStatus;
+  clientId?: string;
+  dueDate?: string;
+  referenceNumber?: string;
+  trademarkName?: string;
+  trademarkDescription?: string;
+  goodsAndServices?: string;
+  specialConsiderations?: string;
+}
+
+export interface UpdateProjectStatusRequest {
+  status: ProjectStatus;
+}
+
 // API Configuration
 const API_BASE_URL = 'https://localhost:7032/api'; // Our .NET API URL (HTTPS)
 const API_TIMEOUT = 10000; // 10 seconds
@@ -273,6 +369,117 @@ class ApiService {
     }
   }
 
+  // Client Management endpoints
+  async getClients(): Promise<Client[]> {
+    try {
+      const response = await this.axiosInstance.get<Client[]>('/client');
+      return response.data;
+    } catch (error) {
+      console.error('Get clients API error:', error);
+      throw error;
+    }
+  }
+
+  async getClient(id: string): Promise<Client> {
+    try {
+      const response = await this.axiosInstance.get<Client>(`/client/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get client API error:', error);
+      throw error;
+    }
+  }
+
+  async createClient(clientData: CreateClientRequest): Promise<Client> {
+    try {
+      const response = await this.axiosInstance.post<Client>('/client', clientData);
+      return response.data;
+    } catch (error) {
+      console.error('Create client API error:', error);
+      throw error;
+    }
+  }
+
+  async updateClient(id: string, clientData: UpdateClientRequest): Promise<Client> {
+    try {
+      const response = await this.axiosInstance.put<Client>(`/client/${id}`, clientData);
+      return response.data;
+    } catch (error) {
+      console.error('Update client API error:', error);
+      throw error;
+    }
+  }
+
+  async deleteClient(id: string): Promise<void> {
+    try {
+      await this.axiosInstance.delete(`/client/${id}`);
+    } catch (error) {
+      console.error('Delete client API error:', error);
+      throw error;
+    }
+  }
+
+  // Project Management endpoints
+  async getProjects(search?: string): Promise<Project[]> {
+    try {
+      const url = search ? `/project?search=${encodeURIComponent(search)}` : '/project';
+      const response = await this.axiosInstance.get<Project[]>(url);
+      return response.data;
+    } catch (error) {
+      console.error('Get projects API error:', error);
+      throw error;
+    }
+  }
+
+  async getProject(id: string): Promise<Project> {
+    try {
+      const response = await this.axiosInstance.get<Project>(`/project/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get project API error:', error);
+      throw error;
+    }
+  }
+
+  async createProject(projectData: CreateProjectRequest): Promise<Project> {
+    try {
+      const response = await this.axiosInstance.post<Project>('/project', projectData);
+      return response.data;
+    } catch (error) {
+      console.error('Create project API error:', error);
+      throw error;
+    }
+  }
+
+  async updateProject(id: string, projectData: UpdateProjectRequest): Promise<Project> {
+    try {
+      const response = await this.axiosInstance.put<Project>(`/project/${id}`, projectData);
+      return response.data;
+    } catch (error) {
+      console.error('Update project API error:', error);
+      throw error;
+    }
+  }
+
+  async updateProjectStatus(id: string, status: ProjectStatus): Promise<Project> {
+    try {
+      const response = await this.axiosInstance.put<Project>(`/project/${id}/status`, { status });
+      return response.data;
+    } catch (error) {
+      console.error('Update project status API error:', error);
+      throw error;
+    }
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    try {
+      await this.axiosInstance.delete(`/project/${id}`);
+    } catch (error) {
+      console.error('Delete project API error:', error);
+      throw error;
+    }
+  }
+
   // Health check endpoint (not under /api prefix)
   async healthCheck(): Promise<string> {
     try {
@@ -338,4 +545,19 @@ export const getProfile = apiService.getProfile.bind(apiService);
 export const updateProfile = apiService.updateProfile.bind(apiService);
 export const validateToken = apiService.validateToken.bind(apiService);
 export const refreshToken = apiService.refreshToken.bind(apiService);
-export const healthCheck = apiService.healthCheck.bind(apiService); 
+export const healthCheck = apiService.healthCheck.bind(apiService);
+
+// Client Management exports
+export const getClients = apiService.getClients.bind(apiService);
+export const getClient = apiService.getClient.bind(apiService);
+export const createClient = apiService.createClient.bind(apiService);
+export const updateClient = apiService.updateClient.bind(apiService);
+export const deleteClient = apiService.deleteClient.bind(apiService);
+
+// Project Management exports
+export const getProjects = apiService.getProjects.bind(apiService);
+export const getProject = apiService.getProject.bind(apiService);
+export const createProject = apiService.createProject.bind(apiService);
+export const updateProject = apiService.updateProject.bind(apiService);
+export const updateProjectStatus = apiService.updateProjectStatus.bind(apiService);
+export const deleteProject = apiService.deleteProject.bind(apiService); 

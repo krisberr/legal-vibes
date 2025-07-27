@@ -15,6 +15,7 @@ public class User : BaseEntity
     
     // Navigation properties
     public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
+    public virtual ICollection<Client> Clients { get; set; } = new List<Client>();
     
     public string FullName => $"{FirstName} {LastName}";
 } 

@@ -36,7 +36,22 @@ public class TestController : ControllerBase
             await _unitOfWork.Users.AddAsync(user);
             await _unitOfWork.SaveChangesAsync();
 
-            // 2. Create a project for this user
+            // 2. Create a client for this user
+            var client = new Client
+            {
+                Name = "Acme Inc",
+                Email = "contact@acme.com",
+                PhoneNumber = "555-123-4567",
+                CompanyName = "Acme Corporation",
+                Address = "123 Business St, City, State 12345",
+                UserId = user.Id,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _unitOfWork.Clients.AddAsync(client);
+            await _unitOfWork.SaveChangesAsync();
+
+            // 3. Create a project for this user and client
             var project = new Project
             {
                 Name = "Trademark Registration",
@@ -44,9 +59,9 @@ public class TestController : ControllerBase
                 Status = ProjectStatus.InProgress,
                 Type = ProjectType.TrademarkApplication,
                 DueDate = DateTime.Now.AddMonths(1),
-                ClientName = "Acme Inc",
-                ClientReference = "ACM-2025-001",
-                UserId = user.Id, // This sets up the relationship
+                ReferenceNumber = "ACM-2025-001",
+                UserId = user.Id,
+                ClientId = client.Id, // New: Link to Client instead of string fields
                 TrademarkName = "AcmeCorp",
                 TrademarkDescription = "Technology solutions provider",
                 GoodsAndServices = "Software and consulting services",
@@ -56,7 +71,7 @@ public class TestController : ControllerBase
             await _unitOfWork.Projects.AddAsync(project);
             await _unitOfWork.SaveChangesAsync();
 
-            // 3. Create a document for this project
+            // 4. Create a document for this project
             var document = new Document
             {
                 Name = "Trademark Application",
@@ -70,14 +85,15 @@ public class TestController : ControllerBase
                 IsAIGenerated = true,
                 GenerationPrompt = "Generate trademark application for AcmeCorp",
                 AIModel = "GPT-4",
-                ProjectId = project.Id, // This sets up the relationship
+                ProjectId = project.Id,
                 CreatedAt = DateTime.UtcNow
             };
             await _unitOfWork.Documents.AddAsync(document);
             await _unitOfWork.SaveChangesAsync();
 
-            // 4. Retrieve everything to demonstrate relationships
+            // 5. Retrieve everything to demonstrate relationships
             var retrievedUser = await _unitOfWork.Users.GetByIdAsync(user.Id);
+            var userClients = await _unitOfWork.Clients.FindAsync(c => c.UserId == user.Id);
             var userProjects = await _unitOfWork.Projects.FindAsync(p => p.UserId == user.Id);
             var projectDocuments = await _unitOfWork.Documents.FindAsync(d => d.ProjectId == project.Id);
 
@@ -90,23 +106,34 @@ public class TestController : ControllerBase
                     retrievedUser?.FirstName,
                     retrievedUser?.LastName,
                     retrievedUser?.Email,
-                    retrievedUser?.CreatedAt // Note: This comes from BaseEntity
+                    retrievedUser?.CreatedAt
                 },
+                Clients = userClients.Select(c => new
+                {
+                    c.Id,
+                    c.Name,
+                    c.Email,
+                    c.CompanyName,
+                    c.CreatedAt,
+                    c.UserId
+                }),
                 Projects = userProjects.Select(p => new
                 {
                     p.Id,
                     p.Name,
                     p.Status,
-                    p.CreatedAt, // From BaseEntity
-                    p.UserId // Navigation property
+                    p.ReferenceNumber, // Updated field name
+                    p.CreatedAt,
+                    p.UserId,
+                    p.ClientId // New: Reference to Client
                 }),
                 Documents = projectDocuments.Select(d => new
                 {
                     d.Id,
                     d.Name,
                     d.Status,
-                    d.CreatedAt, // From BaseEntity
-                    d.ProjectId // Navigation property
+                    d.CreatedAt,
+                    d.ProjectId
                 })
             });
         }
