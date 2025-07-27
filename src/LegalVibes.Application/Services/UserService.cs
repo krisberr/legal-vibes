@@ -155,7 +155,43 @@ public class UserService : IUserService
                 return BaseResponse<UserDto>.ErrorResult("User not found");
             }
 
-            // Update only provided fields
+            // Enhanced validation
+            if (!string.IsNullOrWhiteSpace(request.FirstName) && request.FirstName.Trim().Length < 2)
+                return BaseResponse<UserDto>.ErrorResult("First name must be at least 2 characters long");
+
+            if (!string.IsNullOrWhiteSpace(request.LastName) && request.LastName.Trim().Length < 2)
+                return BaseResponse<UserDto>.ErrorResult("Last name must be at least 2 characters long");
+
+            // Basic phone number validation (you can enhance this later)
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber) && request.PhoneNumber.Trim().Length < 10)
+                return BaseResponse<UserDto>.ErrorResult("Phone number must be at least 10 characters long");
+
+            // SECURITY: Prevent JobTitle changes to maintain role-based access control
+            // In production, JobTitle should be managed through Azure Entra ID groups or admin interface
+            if (request.JobTitle != null && request.JobTitle != user.JobTitle)
+            {
+                _logger.LogWarning("Attempt to change job title by user {UserId} from '{CurrentJobTitle}' to '{NewJobTitle}'", 
+                    id, user.JobTitle, request.JobTitle);
+                return BaseResponse<UserDto>.ErrorResult("Job title cannot be changed through profile updates. Contact your administrator for role changes.");
+            }
+
+            // SECURITY: Prevent CompanyName changes to maintain organizational security
+            // In production, CompanyName should be managed through Azure Entra ID or admin interface
+            if (request.CompanyName != null && request.CompanyName != user.CompanyName)
+            {
+                _logger.LogWarning("Attempt to change company name by user {UserId} from '{CurrentCompany}' to '{NewCompany}'", 
+                    id, user.CompanyName, request.CompanyName);
+                return BaseResponse<UserDto>.ErrorResult("Company name cannot be changed through profile updates. Contact your administrator for organization changes.");
+            }
+
+            // TODO: Add more comprehensive validation as per company standards:
+            // - Email changes should be validated against Azure Entra ID
+            // - Phone number format validation (international/local)
+            // - Company name validation against approved organizations
+            // - Character limits and sanitization for all text fields
+            // - Business rules for field combinations
+
+            // Update only provided fields (excluding JobTitle for security)
             if (!string.IsNullOrWhiteSpace(request.FirstName))
                 user.FirstName = request.FirstName.Trim();
             
@@ -165,11 +201,7 @@ public class UserService : IUserService
             if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
                 user.PhoneNumber = request.PhoneNumber.Trim();
             
-            if (request.CompanyName != null)
-                user.CompanyName = string.IsNullOrWhiteSpace(request.CompanyName) ? null : request.CompanyName.Trim();
-            
-            if (request.JobTitle != null)
-                user.JobTitle = string.IsNullOrWhiteSpace(request.JobTitle) ? null : request.JobTitle.Trim();
+            // Note: JobTitle and CompanyName are intentionally excluded from updates for security reasons
 
             user.LastModifiedAt = DateTime.UtcNow;
             user.LastModifiedBy = "System"; // TODO: Get from current user context
