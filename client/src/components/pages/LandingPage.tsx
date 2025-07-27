@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const LandingPage: React.FC = () => {
   return (
@@ -16,12 +17,12 @@ const LandingPage: React.FC = () => {
               <a href="#contact" className="text-slate-600 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">Contact</a>
             </div>
             <div className="flex space-x-4">
-              <button className="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium border border-blue-600 hover:bg-blue-50">
+              <Link to="/login" className="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium border border-blue-600 hover:bg-blue-50">
                 Sign In
-              </button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+              </Link>
+              <Link to="/register" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
                 Get Started
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -39,12 +40,12 @@ const LandingPage: React.FC = () => {
               Harness the power of AI to streamline your trademark applications, automate document generation, and enhance your legal practice.
             </p>
             <div className="mt-10 flex justify-center space-x-4">
-              <button className="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-blue-700 transform transition hover:scale-105">
+              <Link to="/register" className="bg-blue-600 text-white px-8 py-3 rounded-md text-lg font-medium hover:bg-blue-700 transform transition hover:scale-105">
                 Start Free Trial
-              </button>
-              <button className="bg-white text-blue-600 px-8 py-3 rounded-md text-lg font-medium border-2 border-blue-600 hover:bg-blue-50 transform transition hover:scale-105">
-                Watch Demo
-              </button>
+              </Link>
+              <Link to="/login" className="bg-white text-blue-600 px-8 py-3 rounded-md text-lg font-medium border-2 border-blue-600 hover:bg-blue-50 transform transition hover:scale-105">
+                Sign In
+              </Link>
             </div>
           </div>
         </div>

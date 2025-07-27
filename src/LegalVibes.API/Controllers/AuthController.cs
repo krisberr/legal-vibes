@@ -192,18 +192,87 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>New JWT token</returns>
     [HttpPost("refresh-token")]
-    [Authorize]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(object), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(object), StatusCodes.Status501NotImplemented)]
-    public IActionResult RefreshToken()
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RefreshToken()
     {
-        // TODO: Implement refresh token logic for production
-        // For now, return not implemented
-        return StatusCode(StatusCodes.Status501NotImplemented, new 
-        { 
-            error = "Refresh token functionality not yet implemented",
-            message = "Please log in again when your token expires"
-        });
+        try
+        {
+            // Get token from Authorization header
+            var authHeader = Request.Headers.Authorization.FirstOrDefault();
+            if (authHeader == null || !authHeader.StartsWith("Bearer "))
+            {
+                return Unauthorized(new { error = "No token provided" });
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            
+            // Use IJwtService to validate expired token (structure check only)
+            var jwtService = HttpContext.RequestServices.GetRequiredService<IJwtService>();
+            var principal = jwtService.ValidateExpiredToken(token);
+            
+            if (principal == null)
+            {
+                return Unauthorized(new { error = "Invalid token structure" });
+            }
+
+            // Extract user ID from token
+            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { error = "Invalid user ID in token" });
+            }
+
+            // Get fresh user data from database
+            var userResult = await _userService.GetByIdAsync(userId);
+            if (!userResult.Success || userResult.Data == null)
+            {
+                return Unauthorized(new { error = "User not found or inactive" });
+            }
+
+            var user = userResult.Data;
+            
+            // Check if user is still active
+            if (!user.IsActive)
+            {
+                return Unauthorized(new { error = "User account is inactive" });
+            }
+
+            // Generate new token
+            var newToken = jwtService.GenerateToken(new Domain.Entities.User
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                IsActive = user.IsActive,
+                CompanyName = user.CompanyName,
+                JobTitle = user.JobTitle,
+                CreatedAt = user.CreatedAt
+            });
+
+            _logger.LogInformation("Token refreshed successfully for user: {Email}", user.Email);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Token refreshed successfully",
+                data = new
+                {
+                    token = newToken,
+                    user = user
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error refreshing token");
+            return StatusCode(StatusCodes.Status500InternalServerError, new 
+            { 
+                error = "An error occurred while refreshing the token" 
+            });
+        }
     }
 } 
